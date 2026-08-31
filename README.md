@@ -359,3 +359,14 @@ Todas las peticiones usan:
 ## 👨‍💻 Asignatura
 
 **Programación Web I**
+
+---
+
+## 👤 Autor
+
+| Campo | Detalle |
+|---|---|
+| **Nombre** | Alex Rodriguez C. |
+| **Institución** | Instituto Tecnológico Superior Cordillera |
+| **Curso** | Tercero "A" Nocturno |
+| **Asignatura** | Programación Web I |
