@@ -41,10 +41,11 @@ export class CitasComponent implements OnInit {
 
   // Crear objeto cita vacío
   nuevaCita(): Cita {
+    const hoy = new Date().toISOString().split('T')[0];
     return {
       idCita: 0,
-      fecha: '',
-      hora: '',
+      fecha: hoy,
+      hora: '10:00',
       motivo: '',
       descTratamiento: '',
       estado: 1,
@@ -102,6 +103,7 @@ export class CitasComponent implements OnInit {
   abrirCrear(): void {
     this.citaForm = this.nuevaCita();
     this.editando.set(false);
+    this.mensaje.set('');
     this.mostrarModal.set(true);
   }
 
@@ -118,6 +120,7 @@ export class CitasComponent implements OnInit {
       idMedico: cita.idMedico ?? 0
     };
     this.editando.set(true);
+    this.mensaje.set('');
     this.mostrarModal.set(true);
   }
 
@@ -129,49 +132,52 @@ export class CitasComponent implements OnInit {
   // Guardar cita (crear o actualizar)
   guardarCita(): void {
     // Validaciones básicas
-    if (!this.citaForm.idPaciente || this.citaForm.idPaciente === 0) {
-      this.mensaje.set('Seleccione un paciente');
+    if (!this.citaForm.idPaciente || Number(this.citaForm.idPaciente) === 0) {
+      this.mensaje.set('Por favor, seleccione un paciente.');
       return;
     }
     if (!this.citaForm.fecha) {
-      this.mensaje.set('Ingrese la fecha de la cita');
+      this.mensaje.set('Por favor, ingrese la fecha de la cita.');
       return;
     }
     if (!this.citaForm.hora) {
-      this.mensaje.set('Ingrese la hora de la cita');
+      this.mensaje.set('Por favor, ingrese la hora de la cita.');
       return;
     }
-    if (!this.citaForm.motivo) {
-      this.mensaje.set('Ingrese el motivo de la cita');
+    if (!this.citaForm.motivo?.trim()) {
+      this.mensaje.set('Por favor, ingrese el motivo de la cita.');
       return;
     }
 
     this.guardando.set(true);
     this.mensaje.set('');
 
+    const medVal = this.citaForm.idMedico ? Number(this.citaForm.idMedico) : 0;
+
     // Preparar datos para enviar
-    const citaEnviar: any = {
-      idCita: this.citaForm.idCita,
+    const citaEnviar: Cita = {
+      idCita: Number(this.citaForm.idCita) || 0,
       fecha: this.citaForm.fecha,
-      hora: this.citaForm.hora + ':00',
-      motivo: this.citaForm.motivo,
-      descTratamiento: this.citaForm.descTratamiento,
-      estado: this.citaForm.estado,
+      hora: this.citaForm.hora,
+      motivo: this.citaForm.motivo.trim(),
+      descTratamiento: this.citaForm.descTratamiento?.trim() || '',
+      estado: Number(this.citaForm.estado) ?? 1,
       idPaciente: Number(this.citaForm.idPaciente),
-      idMedico: this.citaForm.idMedico ? Number(this.citaForm.idMedico) : null
+      idMedico: medVal > 0 ? medVal : undefined
     };
 
     if (this.editando()) {
       // Actualizar cita existente
       this.tratamientoService.actualizarCita(citaEnviar).subscribe({
         next: () => {
-          this.mensaje.set('Cita actualizada correctamente');
+          this.mensaje.set('Cita actualizada correctamente.');
           this.guardando.set(false);
           this.cerrarModal();
           this.cargarDatos();
         },
-        error: () => {
-          this.mensaje.set('Error al actualizar la cita');
+        error: (err) => {
+          console.error('Error al actualizar:', err);
+          this.mensaje.set(err?.message || 'Error al actualizar la cita en el servicio SOAP.');
           this.guardando.set(false);
         }
       });
@@ -179,13 +185,14 @@ export class CitasComponent implements OnInit {
       // Crear nueva cita
       this.tratamientoService.agregarCita(citaEnviar).subscribe({
         next: () => {
-          this.mensaje.set('Cita creada exitosamente');
+          this.mensaje.set('Cita creada exitosamente.');
           this.guardando.set(false);
           this.cerrarModal();
           this.cargarDatos();
         },
-        error: () => {
-          this.mensaje.set('Error al crear la cita');
+        error: (err) => {
+          console.error('Error al crear:', err);
+          this.mensaje.set(err?.message || 'Error al crear la cita en el servicio SOAP.');
           this.guardando.set(false);
         }
       });
@@ -203,8 +210,8 @@ export class CitasComponent implements OnInit {
         this.mensaje.set('Cita eliminada correctamente');
         this.cargarDatos();
       },
-      error: () => {
-        this.mensaje.set('Error al eliminar la cita');
+      error: (err) => {
+        this.mensaje.set(err?.message || 'Error al eliminar la cita');
       }
     });
   }
@@ -242,27 +249,29 @@ export class CitasComponent implements OnInit {
   // Formatear fecha para mostrar
   formatFecha(fecha: string): string {
     if (!fecha) return '--';
-    return new Date(fecha).toLocaleDateString('es-ES', {
-      day: '2-digit', month: 'short', year: 'numeric'
-    });
+    const d = fecha.split('T')[0];
+    const parts = d.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return d;
   }
 
   // Formatear hora para mostrar
   formatHora(hora: string): string {
     if (!hora) return '--';
-    return hora.substring(0, 5);
+    return this.tratamientoService.toTimeString(hora);
   }
 
   // Formatear fecha para input type="date"
   formatFechaInput(fecha: string): string {
     if (!fecha) return '';
-    const d = new Date(fecha);
-    return d.toISOString().split('T')[0];
+    return fecha.split('T')[0];
   }
 
   // Formatear hora para input type="time"
   formatHoraInput(hora: string): string {
-    if (!hora) return '';
-    return hora.substring(0, 5);
+    if (!hora) return '10:00';
+    return this.tratamientoService.toTimeString(hora);
   }
 }

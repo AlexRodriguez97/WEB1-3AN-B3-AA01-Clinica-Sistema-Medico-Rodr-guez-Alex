@@ -23,19 +23,26 @@ Este proyecto forma parte del sistema **ClinicaSalud** para la materia **Program
 
 ```
 MedicoAPI/
-├── Controllers_Rest/
-│   └── MedicoController.cs       → Endpoints REST (CRUD)
-├── Models_Rest/
-│   ├── Medico.cs                  → Modelo de Médico
-│   └── Cita.cs                    → Modelo de Cita (relación)
-├── Data_Rest/
-│   └── MedicoDBContext.cs         → Contexto Entity Framework
-├── SQL/
-│   └── Script_ClinicaDB_Medico.sql → Script de base de datos
-├── Postman/
+├── POSTMAN/
 │   └── MedicoAPI_REST_Collection.json → Colección Postman
-├── Program.cs                     → Configuración del servidor
-└── appsettings.json               → Cadena de conexión
+├── SQL/
+│   └── Script_ClinicaDB_Medico.sql    → Script de base de datos
+├── MedicoAPI/                         → Proyecto ASP.NET Core Web API
+│   ├── Controllers_Rest/
+│   │   └── MedicoController.cs        → Endpoints REST (CRUD)
+│   ├── Models_Rest/
+│   │   ├── Medico.cs                  → Modelo de Médico
+│   │   └── Cita.cs                    → Modelo de Cita (relación)
+│   ├── Data_Rest/
+│   │   └── MedicoDBContext.cs         → Contexto Entity Framework
+│   ├── Properties/
+│   │   └── launchSettings.json        → Configuración de ejecución
+│   ├── Program.cs                     → Configuración del servidor
+│   ├── MedicoAPI.csproj               → Archivo de proyecto .NET
+│   └── appsettings.json               → Cadena de conexión
+├── .gitignore                         → Exclusiones de Git
+├── README.md                          → Documentación del proyecto
+└── MedicoAPI.slnx                     → Archivo de solución Visual Studio
 ```
 
 ---
@@ -133,7 +140,9 @@ Abra SQL Server Management Studio y ejecute el archivo `SQL/Script_ClinicaDB_Med
 ### 3. Ejecutar el proyecto
 
 ```bash
+cd MedicoAPI
 dotnet run
+# O desde la raíz: dotnet run --project MedicoAPI/MedicoAPI.csproj
 ```
 
 El servidor se iniciará en `http://localhost:5204`.

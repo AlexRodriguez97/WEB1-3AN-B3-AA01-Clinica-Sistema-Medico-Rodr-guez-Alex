@@ -1,4 +1,4 @@
 <Solution>
-  <Project Path="TratamientoSOAP/Tratamiento.csproj" />
-  <Project Path="MedicoAPI/MedicoAPI.csproj" />
+  <Project Path="TratamientoSOAP/Tratamiento/Tratamiento.csproj" />
+  <Project Path="MedicoAPI/MedicoAPI/MedicoAPI.csproj" />
 </Solution>

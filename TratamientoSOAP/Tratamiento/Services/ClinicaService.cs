@@ -100,7 +100,7 @@ namespace Tratamiento.Services
                 .Where(c => c.IdPaciente == paciente.IdPaciente)
                 .ToList();
         }
-        public Paciente ObtenerPacienteConCitas(string cedula)
+        public Paciente? ObtenerPacienteConCitas(string cedula)
         {            
             return _context.Pacientes
                 .Include(p => p.Citas)

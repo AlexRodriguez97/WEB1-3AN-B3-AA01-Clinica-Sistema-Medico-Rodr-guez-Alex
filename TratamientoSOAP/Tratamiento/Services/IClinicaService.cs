@@ -1,4 +1,4 @@
-﻿using CoreWCF;
+using CoreWCF;
 using Tratamiento.Models;
 
 namespace Tratamiento.Services
@@ -31,6 +31,6 @@ namespace Tratamiento.Services
         List<Cita> ObtenerCitaPorCedula(string cedula);
 
         [OperationContract]
-        Paciente ObtenerPacienteConCitas(string cedula);
+        Paciente? ObtenerPacienteConCitas(string cedula);
     }
 }

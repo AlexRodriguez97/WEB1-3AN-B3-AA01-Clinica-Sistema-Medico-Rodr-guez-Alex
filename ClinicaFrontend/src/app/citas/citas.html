@@ -168,15 +168,23 @@
       </div>
 
       <div class="modal-body">
+        <!-- Alerta de error dentro del modal -->
+        @if (mensaje()) {
+          <div class="alert-error fade-in" style="margin-bottom: 16px; border-radius: 8px;">
+            <span class="material-icons-round">error_outline</span>
+            <span>{{ mensaje() }}</span>
+          </div>
+        }
+
         <!-- Paciente -->
         <div class="form-group">
           <label for="sel-paciente">
             <span class="material-icons-round">person</span> Paciente
           </label>
           <select id="sel-paciente" [(ngModel)]="citaForm.idPaciente" class="form-input">
-            <option [value]="0" disabled>-- Seleccione paciente --</option>
+            <option [ngValue]="0" disabled>-- Seleccione paciente --</option>
             @for (pac of pacientes(); track pac.idPaciente) {
-              <option [value]="pac.idPaciente">{{ pac.nombre }} {{ pac.apellido }} ({{ pac.cedula }})</option>
+              <option [ngValue]="pac.idPaciente">{{ pac.nombre }} {{ pac.apellido }} ({{ pac.cedula }})</option>
             }
           </select>
         </div>
@@ -187,9 +195,9 @@
             <span class="material-icons-round">medical_services</span> Médico
           </label>
           <select id="sel-medico" [(ngModel)]="citaForm.idMedico" class="form-input">
-            <option [value]="0">-- Sin asignar --</option>
+            <option [ngValue]="0">-- Sin asignar --</option>
             @for (med of medicos(); track med.idMedico) {
-              <option [value]="med.idMedico">Dr. {{ med.nombre }} {{ med.apellido }} - {{ med.especialidad }}</option>
+              <option [ngValue]="med.idMedico">Dr. {{ med.nombre }} {{ med.apellido }} - {{ med.especialidad }}</option>
             }
           </select>
         </div>
@@ -234,8 +242,8 @@
             <span class="material-icons-round">toggle_on</span> Estado
           </label>
           <select id="sel-estado" [(ngModel)]="citaForm.estado" class="form-input">
-            <option [value]="1">Activa</option>
-            <option [value]="0">Inactiva</option>
+            <option [ngValue]="1">Activa</option>
+            <option [ngValue]="0">Inactiva</option>
           </select>
         </div>
       </div>

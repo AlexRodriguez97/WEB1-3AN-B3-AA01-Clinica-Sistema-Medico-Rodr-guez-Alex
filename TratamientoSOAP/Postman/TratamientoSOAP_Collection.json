@@ -1,150 +1,336 @@
 {
 	"info": {
 		"_postman_id": "soap-tratamiento-collection",
-		"name": "TratamientoSOAP - API Citas y Pacientes",
-		"description": "Colección de pruebas para el servicio SOAP/REST de TratamientoSOAP.\nBase URL: http://localhost:5087\nEndpoints REST: /api/clinica/*\nEndpoint SOAP: /ClinicaService.svc",
+		"name": "TratamientoSOAP - Servicio Web SOAP",
+		"description": "Colección de pruebas SOAP para el servicio ClinicaService en TratamientoSOAP.\nEndpoint SOAP: http://localhost:5087/ClinicaService.svc\nWSDL: http://localhost:5087/ClinicaService.svc?wsdl\nProtocolo: SOAP 1.1 (BasicHttpBinding)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Pacientes",
-			"item": [
-				{
-					"name": "GET - Obtener todos los pacientes",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:5087/api/clinica/pacientes",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5087",
-							"path": ["api", "clinica", "pacientes"]
+			"name": "1. WSDL - Definicion del Servicio",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5087/ClinicaService.svc?wsdl",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5087",
+					"path": ["ClinicaService.svc"],
+					"query": [
+						{
+							"key": "wsdl",
+							"value": null
 						}
-					}
-				},
-				{
-					"name": "GET - Obtener paciente con citas (por cédula)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:5087/api/clinica/pacientes/1712345678/citas",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5087",
-							"path": ["api", "clinica", "pacientes", "1712345678", "citas"]
-						}
-					}
+					]
 				}
-			]
+			}
 		},
 		{
-			"name": "Citas",
-			"item": [
-				{
-					"name": "GET - Obtener todas las citas",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:5087/api/clinica/citas",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5087",
-							"path": ["api", "clinica", "citas"]
+			"name": "2. ObtenerPacientes",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "http://tempuri.org/IClinicaService/ObtenerPacientes",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <tem:ObtenerPacientes/>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
 						}
 					}
 				},
-				{
-					"name": "GET - Obtener cita por ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:5087/api/clinica/citas/1",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5087",
-							"path": ["api", "clinica", "citas", "1"]
-						}
-					}
-				},
-				{
-					"name": "GET - Obtener citas por tratamiento",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:5087/api/clinica/citas/tratamiento/Cardiología",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5087",
-							"path": ["api", "clinica", "citas", "tratamiento", "Cardiología"]
-						}
-					}
-				},
-				{
-					"name": "POST - Crear nueva cita",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"fecha\": \"2026-09-10\",\n  \"hora\": \"10:00:00\",\n  \"motivo\": \"Chequeo de rutina\",\n  \"descTratamiento\": \"Medicina general\",\n  \"estado\": 1,\n  \"idPaciente\": 1,\n  \"idMedico\": 1\n}"
-						},
-						"url": {
-							"raw": "http://localhost:5087/api/clinica/citas",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5087",
-							"path": ["api", "clinica", "citas"]
-						}
-					}
-				},
-				{
-					"name": "PUT - Actualizar cita",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"idCita\": 1,\n  \"fecha\": \"2026-09-10\",\n  \"hora\": \"11:00:00\",\n  \"motivo\": \"Chequeo general actualizado\",\n  \"descTratamiento\": \"Medicina general\",\n  \"estado\": 1,\n  \"idPaciente\": 1,\n  \"idMedico\": 1\n}"
-						},
-						"url": {
-							"raw": "http://localhost:5087/api/clinica/citas",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5087",
-							"path": ["api", "clinica", "citas"]
-						}
-					}
-				},
-				{
-					"name": "DELETE - Eliminar cita",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:5087/api/clinica/citas/1",
-							"protocol": "http",
-							"host": ["localhost"],
-							"port": "5087",
-							"path": ["api", "clinica", "citas", "1"]
-						}
-					}
+				"url": {
+					"raw": "http://localhost:5087/ClinicaService.svc",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5087",
+					"path": ["ClinicaService.svc"]
 				}
-			]
+			}
+		},
+		{
+			"name": "3. ObtenerCitas",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "http://tempuri.org/IClinicaService/ObtenerCitas",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <tem:ObtenerCitas/>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5087/ClinicaService.svc",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5087",
+					"path": ["ClinicaService.svc"]
+				}
+			}
+		},
+		{
+			"name": "4. ObtenerCitaPorId",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "http://tempuri.org/IClinicaService/ObtenerCita",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <tem:ObtenerCita>\r\n         <tem:id>1</tem:id>\r\n      </tem:ObtenerCita>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5087/ClinicaService.svc",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5087",
+					"path": ["ClinicaService.svc"]
+				}
+			}
+		},
+		{
+			"name": "5. ObtenerCitaPorTratamiento",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "http://tempuri.org/IClinicaService/ObtenerCitaPorTratamiento",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <tem:ObtenerCitaPorTratamiento>\r\n         <tem:tratamiento>Extracción</tem:tratamiento>\r\n      </tem:ObtenerCitaPorTratamiento>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5087/ClinicaService.svc",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5087",
+					"path": ["ClinicaService.svc"]
+				}
+			}
+		},
+		{
+			"name": "6. ObtenerCitaPorCedula",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "http://tempuri.org/IClinicaService/ObtenerCitaPorCedula",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <tem:ObtenerCitaPorCedula>\r\n         <tem:cedula>1712345678</tem:cedula>\r\n      </tem:ObtenerCitaPorCedula>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5087/ClinicaService.svc",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5087",
+					"path": ["ClinicaService.svc"]
+				}
+			}
+		},
+		{
+			"name": "7. ObtenerPacienteConCitas",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "http://tempuri.org/IClinicaService/ObtenerPacienteConCitas",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <tem:ObtenerPacienteConCitas>\r\n         <tem:cedula>1712345678</tem:cedula>\r\n      </tem:ObtenerPacienteConCitas>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5087/ClinicaService.svc",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5087",
+					"path": ["ClinicaService.svc"]
+				}
+			}
+		},
+		{
+			"name": "8. AgregarCita",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "http://tempuri.org/IClinicaService/AgregarCita",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\" xmlns:trat=\"http://schemas.datacontract.org/2004/07/Tratamiento.Models\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <tem:AgregarCita>\r\n         <tem:cita>\r\n            <trat:DescTratamiento>Extracción</trat:DescTratamiento>\r\n            <trat:Estado>1</trat:Estado>\r\n            <trat:Fecha>2026-09-10T00:00:00</trat:Fecha>\r\n            <trat:Hora>PT10H30M</trat:Hora>\r\n            <trat:IdCita>0</trat:IdCita>\r\n            <trat:IdPaciente>1</trat:IdPaciente>\r\n            <trat:Motivo>Dolor de muela</trat:Motivo>\r\n         </tem:cita>\r\n      </tem:AgregarCita>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5087/ClinicaService.svc",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5087",
+					"path": ["ClinicaService.svc"]
+				}
+			}
+		},
+		{
+			"name": "9. ActualizarCita",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "http://tempuri.org/IClinicaService/ActualizarCita",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\" xmlns:trat=\"http://schemas.datacontract.org/2004/07/Tratamiento.Models\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <tem:ActualizarCita>\r\n         <tem:cita>\r\n            <trat:DescTratamiento>Tratamiento de conducto</trat:DescTratamiento>\r\n            <trat:Estado>1</trat:Estado>\r\n            <trat:Fecha>2026-09-10T00:00:00</trat:Fecha>\r\n            <trat:Hora>PT11H00M</trat:Hora>\r\n            <trat:IdCita>1</trat:IdCita>\r\n            <trat:IdPaciente>1</trat:IdPaciente>\r\n            <trat:Motivo>Control post-operatorio</trat:Motivo>\r\n         </tem:cita>\r\n      </tem:ActualizarCita>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5087/ClinicaService.svc",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5087",
+					"path": ["ClinicaService.svc"]
+				}
+			}
+		},
+		{
+			"name": "10. EliminarCita",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml; charset=utf-8",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "http://tempuri.org/IClinicaService/EliminarCita",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">\r\n   <soapenv:Header/>\r\n   <soapenv:Body>\r\n      <tem:EliminarCita>\r\n         <tem:id>999</tem:id>\r\n      </tem:EliminarCita>\r\n   </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5087/ClinicaService.svc",
+					"protocol": "http",
+					"host": ["localhost"],
+					"port": "5087",
+					"path": ["ClinicaService.svc"]
+				}
+			}
 		}
 	]
 }
