@@ -1,0 +1,131 @@
+{
+	"info": {
+		"_postman_id": "rest-medico-collection",
+		"name": "MedicoAPI - API REST Médicos",
+		"description": "Colección de pruebas para la API REST de MedicoAPI.\nBase URL: http://localhost:5204\nEndpoints: /api/medico/*",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Médicos",
+			"item": [
+				{
+					"name": "GET - Obtener todos los médicos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5204/api/medico",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5204",
+							"path": ["api", "medico"]
+						}
+					}
+				},
+				{
+					"name": "GET - Obtener médico por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5204/api/medico/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5204",
+							"path": ["api", "medico", "1"]
+						}
+					}
+				},
+				{
+					"name": "GET - Obtener médico por cédula",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5204/api/medico/cedula/1712340001",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5204",
+							"path": ["api", "medico", "cedula", "1712340001"]
+						}
+					}
+				},
+				{
+					"name": "GET - Obtener médico con sus citas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5204/api/medico/1/citas",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5204",
+							"path": ["api", "medico", "1", "citas"]
+						}
+					}
+				},
+				{
+					"name": "POST - Crear nuevo médico",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cedula\": \"1712340006\",\n  \"nombre\": \"Laura\",\n  \"apellido\": \"Martínez\",\n  \"cargo\": \"Médico Especialista\",\n  \"especialidad\": \"Dermatología\",\n  \"estado\": 1\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5204/api/medico",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5204",
+							"path": ["api", "medico"]
+						}
+					}
+				},
+				{
+					"name": "PUT - Actualizar médico",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idMedico\": 1,\n  \"cedula\": \"1712340001\",\n  \"nombre\": \"Roberto\",\n  \"apellido\": \"Salazar\",\n  \"cargo\": \"Médico Titular Senior\",\n  \"especialidad\": \"Medicina General\",\n  \"estado\": 1\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5204/api/medico/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5204",
+							"path": ["api", "medico", "1"]
+						}
+					}
+				},
+				{
+					"name": "DELETE - Eliminar médico",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5204/api/medico/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5204",
+							"path": ["api", "medico", "1"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

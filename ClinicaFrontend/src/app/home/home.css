@@ -1,0 +1,44 @@
+.home-info-card {
+  padding: 28px 32px;
+  margin-top: 8px;
+}
+
+.home-info-inner {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.home-info-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--accent-dim), var(--accent2-dim));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 26px;
+}
+
+.home-info-inner h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.home-info-inner p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.api-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

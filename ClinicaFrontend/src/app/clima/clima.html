@@ -1,0 +1,164 @@
+<!-- Top Bar -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h1>Clima & Salud</h1>
+    <p class="breadcrumb">Recomendaciones para pacientes basadas en el clima actual</p>
+  </div>
+  <div class="topbar-right">
+    @if (ultimaActualizacion()) {
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        Actualizado {{ ultimaActualizacion() }}
+      </div>
+    }
+    <button class="btn btn-ghost" (click)="cargarClima()" id="btn-refresh-clima">
+      <span class="material-icons-round">refresh</span>
+      Actualizar
+    </button>
+    <div class="topbar-avatar">CL</div>
+  </div>
+</header>
+
+<div class="page-content">
+
+  <!-- Loading -->
+  @if (cargando()) {
+    <div class="loading-spinner fade-in">
+      <div class="spinner"></div>
+      <span>Obteniendo datos climáticos de Open-Meteo...</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (!cargando() && error()) {
+    <div class="alert-error fade-in">
+      <span class="material-icons-round">error_outline</span>
+      {{ error() }}
+    </div>
+  }
+
+  @if (!cargando() && !error() && clima()) {
+    <!-- Location Header -->
+    <div class="location-bar fade-in">
+      <span class="material-icons-round">location_on</span>
+      <span>Quito, Ecuador</span>
+      <span style="color:var(--text-muted)">·</span>
+      <span style="color: var(--text-muted); font-size:13px;">Open-Meteo API (Datos en tiempo real)</span>
+    </div>
+
+    <!-- Weather Hero -->
+    <div class="clima-hero fade-in fade-in-1">
+      <div class="clima-temp-display">
+        <span class="material-icons-round clima-icon-big">
+          {{ getWeatherIcon(clima()!.current.weather_code, clima()!.current.is_day) }}
+        </span>
+        <div class="clima-temp-big">{{ clima()!.current.temperature_2m | number:'1.0-0' }}°C</div>
+        <div class="clima-condition">{{ getWeatherDescription(clima()!.current.weather_code) }}</div>
+        <div class="sensacion-termica">
+          Sensación térmica {{ clima()!.current.apparent_temperature | number:'1.0-0' }}°C
+        </div>
+      </div>
+
+      <div class="clima-details">
+        <div class="clima-detail-item">
+          <span class="material-icons-round">water_drop</span>
+          <div>
+            <div class="clima-detail-label">Humedad</div>
+            <div class="clima-detail-value">{{ clima()!.current.relative_humidity_2m }}%</div>
+          </div>
+        </div>
+        <div class="clima-detail-item">
+          <span class="material-icons-round">air</span>
+          <div>
+            <div class="clima-detail-label">Viento</div>
+            <div class="clima-detail-value">{{ clima()!.current.wind_speed_10m | number:'1.0-0' }} km/h</div>
+          </div>
+        </div>
+        <div class="clima-detail-item">
+          <span class="material-icons-round">flare</span>
+          <div>
+            <div class="clima-detail-label">Índice UV</div>
+            <div class="clima-detail-value" [class]="getUvClass(clima()!.current.uv_index ?? 0)">
+              {{ clima()!.current.uv_index ?? 0 | number:'1.0-0' }} – {{ getUvLabel(clima()!.current.uv_index ?? 0) }}
+            </div>
+          </div>
+        </div>
+        <div class="clima-detail-item">
+          <span class="material-icons-round">umbrella</span>
+          <div>
+            <div class="clima-detail-label">Precipitación</div>
+            <div class="clima-detail-value">{{ clima()!.current.precipitation }} mm</div>
+          </div>
+        </div>
+        <div class="clima-detail-item">
+          <span class="material-icons-round">cloud</span>
+          <div>
+            <div class="clima-detail-label">Nubosidad</div>
+            <div class="clima-detail-value">{{ clima()!.current.cloud_cover }}%</div>
+          </div>
+        </div>
+        <div class="clima-detail-item">
+          <span class="material-icons-round">wb_sunny</span>
+          <div>
+            <div class="clima-detail-label">Período</div>
+            <div class="clima-detail-value">{{ clima()!.current.is_day ? 'Día' : 'Noche' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pronóstico 3 días -->
+    <div class="section-header fade-in fade-in-2">
+      <h2 class="section-title">
+        <span class="material-icons-round">calendar_today</span>
+        Pronóstico 3 días
+      </h2>
+    </div>
+
+    <div class="pronostico-grid fade-in fade-in-2">
+      @for (i of [0, 1, 2]; track i) {
+        <div class="pronostico-card">
+          <div class="pronostico-day">{{ getDayLabel(i) }}</div>
+          <div class="pronostico-temps">
+            <span class="temp-max">{{ getDailyTemp(i, 'max') | number:'1.0-0' }}°</span>
+            <span class="temp-min">{{ getDailyTemp(i, 'min') | number:'1.0-0' }}°</span>
+          </div>
+          <div class="pronostico-precip">
+            <span class="material-icons-round" style="font-size:14px; color: var(--accent2)">water_drop</span>
+            {{ getPrecipitacion(i) | number:'1.1-1' }} mm
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Recomendaciones -->
+    <div class="section-header fade-in fade-in-3" style="margin-top: 32px;">
+      <h2 class="section-title">
+        <span class="material-icons-round">health_and_safety</span>
+        Recomendaciones para Pacientes
+      </h2>
+      <span class="rec-count-badge">{{ recomendaciones().length }} alertas</span>
+    </div>
+
+    <div class="recomendaciones-grid fade-in fade-in-3" id="grid-recomendaciones">
+      @for (rec of recomendaciones(); track rec.titulo) {
+        <div class="recomendacion-card" [class]="rec.tipo">
+          <div class="rec-icon">
+            <span class="material-icons-round">{{ rec.icono }}</span>
+          </div>
+          <div>
+            <div class="rec-titulo">{{ rec.titulo }}</div>
+            <div class="rec-desc">{{ rec.descripcion }}</div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer fade-in">
+      <span class="material-icons-round">info</span>
+      <span>Datos proporcionados por <strong>Open-Meteo</strong> (open-meteo.com). Las recomendaciones son orientativas. Consulte siempre a su médico tratante.</span>
+    </div>
+  }
+
+</div>

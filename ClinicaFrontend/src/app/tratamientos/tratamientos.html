@@ -1,0 +1,131 @@
+<!-- Top Bar -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h1>Tratamientos</h1>
+    <p class="breadcrumb">Citas con paciente y tratamiento asignado</p>
+  </div>
+  <div class="topbar-right">
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      TratamientoAPI :5087
+    </div>
+    <div class="topbar-avatar">TX</div>
+  </div>
+</header>
+
+<div class="page-content">
+
+  <!-- Section Header -->
+  <div class="section-header fade-in">
+    <h2 class="section-title">
+      <span class="material-icons-round">medical_services</span>
+      Lista de Citas ({{ citasFiltradas().length }})
+    </h2>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <div class="search-bar">
+        <span class="material-icons-round">search</span>
+        <input
+          type="text"
+          placeholder="Buscar por motivo, tratamiento o paciente..."
+          [(ngModel)]="busqueda"
+          (input)="buscar()"
+          id="buscar-citas"
+        >
+      </div>
+      <button class="btn btn-ghost" (click)="cargarDatos()" id="btn-refresh-citas">
+        <span class="material-icons-round">refresh</span>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (cargando()) {
+    <div class="loading-spinner fade-in">
+      <div class="spinner"></div>
+      <span>Cargando citas desde TratamientoAPI...</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (!cargando() && error()) {
+    <div class="alert-error fade-in">
+      <span class="material-icons-round">error_outline</span>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!cargando() && !error()) {
+    @if (citasFiltradas().length === 0) {
+      <div class="empty-state fade-in">
+        <span class="material-icons-round">event_busy</span>
+        <h3>No hay citas registradas</h3>
+        <p>Las citas aparecerán aquí una vez que se agreguen al sistema</p>
+      </div>
+    } @else {
+      <div class="table-wrapper fade-in">
+        <table class="data-table" id="tabla-citas">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Paciente</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Motivo</th>
+              <th>Tratamiento</th>
+              <th>Médico</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cita of citasFiltradas(); track cita.idCita) {
+              <tr>
+                <td>
+                  <span style="color: var(--text-muted); font-size: 13px;">#{{ cita.idCita }}</span>
+                </td>
+                <td>
+                  <div class="paciente-cell">
+                    <div class="paciente-avatar">
+                      {{ getNombrePaciente(cita.idPaciente).charAt(0) }}
+                    </div>
+                    <span>{{ getNombrePaciente(cita.idPaciente) }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="material-icons-round" style="font-size:15px; color:var(--text-muted)">event</span>
+                    {{ formatFecha(cita.fecha) }}
+                  </div>
+                </td>
+                <td>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="material-icons-round" style="font-size:15px; color:var(--text-muted)">schedule</span>
+                    {{ formatHora(cita.hora) }}
+                  </div>
+                </td>
+                <td style="max-width:180px;">
+                  <span class="motivo-text">{{ cita.motivo || '—' }}</span>
+                </td>
+                <td style="max-width:200px;">
+                  <span class="tratamiento-text">{{ cita.descTratamiento || '—' }}</span>
+                </td>
+                <td>
+                  <span style="color: var(--accent2); font-size: 13px;">
+                    {{ getNombreMedico(cita.idMedico) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge" [class]="getEstadoBadge(cita.estado)">
+                    {{ getEstadoLabel(cita.estado) }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+</div>

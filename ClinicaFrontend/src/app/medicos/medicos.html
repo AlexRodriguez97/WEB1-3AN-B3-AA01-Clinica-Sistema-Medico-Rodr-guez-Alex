@@ -1,0 +1,557 @@
+<!-- Top Bar -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h1>Personal Médico</h1>
+    <p class="breadcrumb">Gestión integral del directorio médico y citas asignadas</p>
+  </div>
+  <div class="topbar-right">
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      MedicoAPI :5204
+    </div>
+    <div class="topbar-avatar">MD</div>
+  </div>
+</header>
+
+<div class="page-content">
+
+  <!-- Mensaje de éxito -->
+  @if (mensajeExito()) {
+    <div class="alert-msg alert-msg-success fade-in">
+      <span class="material-icons-round">check_circle</span>
+      <span>{{ mensajeExito() }}</span>
+      <button class="btn-close-msg" (click)="mensajeExito.set('')">×</button>
+    </div>
+  }
+
+  <!-- Error general -->
+  @if (error()) {
+    <div class="alert-msg alert-msg-error fade-in">
+      <span class="material-icons-round">error_outline</span>
+      <span>{{ error() }}</span>
+      <button class="btn-close-msg" (click)="error.set('')">×</button>
+    </div>
+  }
+
+  <!-- Stats row -->
+  @if (!cargando()) {
+    <div class="medicos-stats fade-in">
+      <div class="mstat">
+        <span class="mstat-val">{{ medicos().length }}</span>
+        <span class="mstat-label">Total médicos</span>
+      </div>
+      <div class="mstat-divider"></div>
+      <div class="mstat">
+        <span class="mstat-val" style="color: var(--success)">{{ totalActivos() }}</span>
+        <span class="mstat-label">Activos</span>
+      </div>
+      <div class="mstat-divider"></div>
+      <div class="mstat">
+        <span class="mstat-val" style="color: var(--text-muted)">{{ medicos().length - totalActivos() }}</span>
+        <span class="mstat-label">Inactivos</span>
+      </div>
+      <div class="mstat-divider"></div>
+      <div class="mstat">
+        <span class="mstat-val" style="color: var(--accent2)">{{ especialidades().length }}</span>
+        <span class="mstat-label">Especialidades</span>
+      </div>
+    </div>
+  }
+
+  <!-- Action Bar & Filters -->
+  <div class="section-header fade-in">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <h2 class="section-title">
+        <span class="material-icons-round">medical_services</span>
+        Directorio Médico ({{ medicosFiltrados().length }})
+      </h2>
+      <button class="btn btn-primary" (click)="abrirModalCrear()" id="btn-nuevo-medico">
+        <span class="material-icons-round">person_add</span>
+        Nuevo Médico
+      </button>
+    </div>
+
+    <!-- Filtros y Búsquedas -->
+    <div class="filter-controls">
+      <!-- Búsqueda en vivo -->
+      <div class="search-bar">
+        <span class="material-icons-round">search</span>
+        <input
+          type="text"
+          placeholder="Buscar por nombre, cargo..."
+          [(ngModel)]="busqueda"
+          (input)="filtrar()"
+          id="buscar-medicos"
+        >
+      </div>
+
+      <!-- Filtro por Especialidad -->
+      <select class="filter-select" [(ngModel)]="filtroEspecialidad" (change)="filtrar()" id="filtro-especialidad">
+        <option value="">Todas las especialidades</option>
+        @for (esp of especialidades(); track esp) {
+          <option [value]="esp">{{ esp }}</option>
+        }
+      </select>
+
+      <!-- Búsqueda específica por Cédula (GET api/medico/cedula/{cedula}) -->
+      <div class="cedula-search-box">
+        <input
+          type="text"
+          placeholder="Cédula exacta..."
+          [(ngModel)]="cedulaBusqueda"
+          (keyup.enter)="buscarPorCedulaDirecta()"
+          id="buscar-cedula-input"
+        >
+        <button
+          class="btn-cedula-search"
+          (click)="buscarPorCedulaDirecta()"
+          [disabled]="buscandoCedula() || !cedulaBusqueda.trim()"
+          title="Buscar por endpoint GET /api/medico/cedula/{cedula}"
+          id="btn-buscar-cedula"
+        >
+          @if (buscandoCedula()) {
+            <span class="spinner-sm"></span>
+          } @else {
+            <span class="material-icons-round">badge</span>
+          }
+        </button>
+      </div>
+
+      <button class="btn btn-ghost" (click)="cargarMedicos()" title="Recargar lista" id="btn-refresh-medicos">
+        <span class="material-icons-round">refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (cargando()) {
+    <div class="loading-spinner fade-in">
+      <div class="spinner"></div>
+      <span>Cargando médicos desde MedicoAPI (localhost:5204)...</span>
+    </div>
+  }
+
+  <!-- Cards Grid -->
+  @if (!cargando()) {
+    @if (medicosFiltrados().length === 0) {
+      <div class="empty-state fade-in">
+        <span class="material-icons-round">person_search</span>
+        <h3>No se encontraron médicos</h3>
+        <p>Intente con otros filtros o registre un nuevo médico con el botón superior.</p>
+        <button class="btn btn-primary" style="margin-top:12px;" (click)="abrirModalCrear()">
+          <span class="material-icons-round">add</span>
+          Crear Primer Médico
+        </button>
+      </div>
+    } @else {
+      <div class="medicos-grid" id="grid-medicos">
+        @for (medico of medicosFiltrados(); track medico.idMedico) {
+          <div class="medico-card fade-in">
+            <!-- Header de tarjeta -->
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div class="medico-avatar">{{ getIniciales(medico) }}</div>
+                <div>
+                  <div class="medico-name">Dr. {{ medico.nombre }} {{ medico.apellido }}</div>
+                  <div class="medico-especialidad">{{ medico.especialidad || 'Sin especialidad' }}</div>
+                </div>
+              </div>
+              <span class="badge" [class]="getEstadoBadge(medico.estado)">
+                {{ getEstadoLabel(medico.estado) }}
+              </span>
+            </div>
+
+            <!-- Datos -->
+            <div class="medico-details-list">
+              <div class="medico-info-row">
+                <span class="material-icons-round">badge</span>
+                <span>Cédula: <strong>{{ medico.cedula }}</strong></span>
+              </div>
+              <div class="medico-info-row">
+                <span class="material-icons-round">work</span>
+                <span>Cargo: <strong>{{ medico.cargo || 'Sin cargo' }}</strong></span>
+              </div>
+              <div class="medico-info-row">
+                <span class="material-icons-round">tag</span>
+                <span>ID Médico: <strong>#{{ medico.idMedico }}</strong></span>
+              </div>
+            </div>
+
+            <!-- Acciones para todos los endpoints -->
+            <div class="medico-card-actions">
+              <!-- GET /api/medico/{id}/citas -->
+              <button
+                class="btn-card-action btn-citas"
+                (click)="abrirModalCitas(medico)"
+                title="Ver citas asignadas (GET /api/medico/{{ medico.idMedico }}/citas)"
+                id="btn-citas-{{ medico.idMedico }}"
+              >
+                <span class="material-icons-round">event_note</span>
+                <span>Ver Citas</span>
+              </button>
+
+              <!-- GET /api/medico/{id} -->
+              <button
+                class="btn-card-action btn-detail"
+                (click)="abrirModalDetalle(medico.idMedico)"
+                title="Consultar detalles (GET /api/medico/{{ medico.idMedico }})"
+                id="btn-detalle-{{ medico.idMedico }}"
+              >
+                <span class="material-icons-round">info</span>
+              </button>
+
+              <!-- PUT /api/medico/{id} -->
+              <button
+                class="btn-card-action btn-edit"
+                (click)="abrirModalEditar(medico)"
+                title="Editar médico (PUT /api/medico/{{ medico.idMedico }})"
+                id="btn-editar-{{ medico.idMedico }}"
+              >
+                <span class="material-icons-round">edit</span>
+              </button>
+
+              <!-- DELETE /api/medico/{id} -->
+              <button
+                class="btn-card-action btn-delete"
+                (click)="abrirModalEliminar(medico)"
+                title="Eliminar médico (DELETE /api/medico/{{ medico.idMedico }})"
+                id="btn-eliminar-{{ medico.idMedico }}"
+              >
+                <span class="material-icons-round">delete_outline</span>
+              </button>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>
+
+<!-- ================================================================= -->
+<!-- MODAL: Crear / Editar Médico (POST api/medico y PUT api/medico/{id}) -->
+<!-- ================================================================= -->
+@if (modalFormAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModalForm()">
+    <div class="modal-card fade-in" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="modal-icon-badge">
+            <span class="material-icons-round">{{ esModoEdicion() ? 'edit' : 'person_add' }}</span>
+          </div>
+          <div>
+            <h3>{{ esModoEdicion() ? 'Editar Médico #' + medicoForm.idMedico : 'Registrar Nuevo Médico' }}</h3>
+            <p class="modal-subtitle">
+              {{ esModoEdicion() ? 'Actualiza los datos del profesional médico' : 'Completa los campos para registrar en MedicoAPI' }}
+            </p>
+          </div>
+        </div>
+        <button class="btn-close-modal" (click)="cerrarModalForm()">×</button>
+      </div>
+
+      @if (errorModal()) {
+        <div class="alert-error" style="margin: 0 24px 16px;">
+          <span class="material-icons-round">warning</span>
+          {{ errorModal() }}
+        </div>
+      }
+
+      <div class="modal-body">
+        <div class="form-grid">
+          <!-- Cédula -->
+          <div class="form-group">
+            <label>Cédula *</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="medicoForm.cedula"
+              placeholder="Ej: 1712340009"
+              maxlength="10"
+              id="input-cedula"
+            >
+          </div>
+
+          <!-- Cargo -->
+          <div class="form-group">
+            <label>Cargo</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="medicoForm.cargo"
+              placeholder="Ej: Médico Titular, Especialista..."
+              id="input-cargo"
+            >
+          </div>
+
+          <!-- Nombre -->
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="medicoForm.nombre"
+              placeholder="Nombre del médico"
+              id="input-nombre"
+            >
+          </div>
+
+          <!-- Apellido -->
+          <div class="form-group">
+            <label>Apellido *</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="medicoForm.apellido"
+              placeholder="Apellido del médico"
+              id="input-apellido"
+            >
+          </div>
+
+          <!-- Especialidad -->
+          <div class="form-group">
+            <label>Especialidad</label>
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="medicoForm.especialidad"
+              list="lista-esp"
+              placeholder="Seleccione o escriba..."
+              id="input-especialidad"
+            >
+            <datalist id="lista-esp">
+              @for (esp of listaEspecialidades; track esp) {
+                <option [value]="esp"></option>
+              }
+            </datalist>
+          </div>
+
+          <!-- Estado -->
+          <div class="form-group">
+            <label>Estado</label>
+            <select class="form-input" [(ngModel)]="medicoForm.estado" id="input-estado">
+              <option [ngValue]="1">Activo</option>
+              <option [ngValue]="0">Inactivo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" (click)="cerrarModalForm()" [disabled]="guardando()">Cancelar</button>
+        <button class="btn btn-primary" (click)="guardarMedico()" [disabled]="guardando()" id="btn-submit-medico">
+          @if (guardando()) {
+            <span class="spinner-sm"></span> Guardando...
+          } @else {
+            <span class="material-icons-round">save</span>
+            {{ esModoEdicion() ? 'Actualizar Médico' : 'Crear Médico' }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ================================================================= -->
+<!-- MODAL: Citas del Médico (GET api/medico/{id}/citas) -->
+<!-- ================================================================= -->
+@if (modalCitasAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModalCitas()">
+    <div class="modal-card modal-large fade-in" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="modal-icon-badge modal-icon-accent2">
+            <span class="material-icons-round">calendar_month</span>
+          </div>
+          <div>
+            @if (medicoConCitas()) {
+              <h3>Citas del Dr. {{ medicoConCitas()?.nombre }} {{ medicoConCitas()?.apellido }}</h3>
+              <p class="modal-subtitle">
+                {{ medicoConCitas()?.especialidad }} &bull; Cédula: {{ medicoConCitas()?.cedula }}
+              </p>
+            } @else {
+              <h3>Cargando Citas del Médico...</h3>
+            }
+          </div>
+        </div>
+        <button class="btn-close-modal" (click)="cerrarModalCitas()">×</button>
+      </div>
+
+      <div class="modal-body">
+        @if (cargandoCitas()) {
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <span>Consultando citas en endpoint GET /api/medico/id/citas...</span>
+          </div>
+        } @else if (medicoConCitas()) {
+          @if (medicoConCitas()?.citas?.length === 0) {
+            <div class="empty-state" style="padding: 30px;">
+              <span class="material-icons-round">event_busy</span>
+              <h4>Sin citas programadas</h4>
+              <p>Este médico no tiene citas registradas en el sistema actualmente.</p>
+            </div>
+          } @else {
+            <div class="citas-table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID Cita</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Motivo</th>
+                    <th>Tratamiento</th>
+                    <th>ID Paciente</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (cita of medicoConCitas()?.citas; track cita.idCita) {
+                    <tr>
+                      <td><span class="id-tag">#{{ cita.idCita }}</span></td>
+                      <td><strong>{{ cita.fecha }}</strong></td>
+                      <td>{{ cita.hora }}</td>
+                      <td>{{ cita.motivo }}</td>
+                      <td>
+                        <span class="text-secondary">{{ cita.descTratamiento || 'General' }}</span>
+                      </td>
+                      <td>
+                        <span class="badge badge-accent">Paciente #{{ cita.idPaciente }}</span>
+                      </td>
+                      <td>
+                        <span class="badge" [class.badge-active]="cita.estado === 1" [class.badge-inactive]="cita.estado === 0">
+                          {{ cita.estado === 1 ? 'Programada' : 'Finalizada' }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" (click)="cerrarModalCitas()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ================================================================= -->
+<!-- MODAL: Detalle Médico (GET api/medico/{id} o por Cédula) -->
+<!-- ================================================================= -->
+@if (modalDetalleAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModalDetalle()">
+    <div class="modal-card fade-in" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="modal-icon-badge">
+            <span class="material-icons-round">badge</span>
+          </div>
+          <div>
+            <h3>Detalle del Profesional Médico</h3>
+            <p class="modal-subtitle">Información directa obtenida de MedicoAPI</p>
+          </div>
+        </div>
+        <button class="btn-close-modal" (click)="cerrarModalDetalle()">×</button>
+      </div>
+
+      <div class="modal-body">
+        @if (cargandoDetalle()) {
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <span>Consultando datos del médico...</span>
+          </div>
+        } @else if (medicoDetalle()) {
+          <div class="detalle-card-content">
+            <div class="detalle-avatar-large">
+              {{ getIniciales(medicoDetalle()!) }}
+            </div>
+            <h4>Dr. {{ medicoDetalle()?.nombre }} {{ medicoDetalle()?.apellido }}</h4>
+            <span class="especialidad-chip" [style.color]="getEspecialidadColor(medicoDetalle()?.especialidad!)">
+              {{ medicoDetalle()?.especialidad }}
+            </span>
+
+            <div class="detalle-grid">
+              <div class="d-item">
+                <span class="d-label">ID Sistema:</span>
+                <span class="d-val">#{{ medicoDetalle()?.idMedico }}</span>
+              </div>
+              <div class="d-item">
+                <span class="d-label">Cédula:</span>
+                <span class="d-val">{{ medicoDetalle()?.cedula }}</span>
+              </div>
+              <div class="d-item">
+                <span class="d-label">Cargo:</span>
+                <span class="d-val">{{ medicoDetalle()?.cargo }}</span>
+              </div>
+              <div class="d-item">
+                <span class="d-label">Estado:</span>
+                <span class="badge" [class]="getEstadoBadge(medicoDetalle()?.estado!)">
+                  {{ getEstadoLabel(medicoDetalle()?.estado!) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        @if (medicoDetalle()) {
+          <button class="btn btn-ghost" (click)="abrirModalCitas(medicoDetalle()!); cerrarModalDetalle()">
+            <span class="material-icons-round">event_note</span> Ver Citas
+          </button>
+          <button class="btn btn-primary" (click)="abrirModalEditar(medicoDetalle()!); cerrarModalDetalle()">
+            <span class="material-icons-round">edit</span> Editar
+          </button>
+        }
+        <button class="btn btn-ghost" (click)="cerrarModalDetalle()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ================================================================= -->
+<!-- MODAL: Confirmar Eliminación (DELETE api/medico/{id}) -->
+<!-- ================================================================= -->
+@if (modalEliminarAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModalEliminar()">
+    <div class="modal-card modal-sm fade-in" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="modal-icon-badge modal-icon-danger">
+            <span class="material-icons-round">warning</span>
+          </div>
+          <div>
+            <h3>¿Eliminar Médico?</h3>
+            <p class="modal-subtitle">Esta acción eliminará el registro de MedicoAPI</p>
+          </div>
+        </div>
+        <button class="btn-close-modal" (click)="cerrarModalEliminar()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6;">
+          ¿Está seguro de que desea eliminar al
+          <strong style="color: var(--text-primary)">
+            Dr. {{ medicoAEliminar()?.nombre }} {{ medicoAEliminar()?.apellido }}
+          </strong>
+          (Cédula: {{ medicoAEliminar()?.cedula }})?
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" (click)="cerrarModalEliminar()" [disabled]="eliminando()">Cancelar</button>
+        <button class="btn btn-danger" (click)="confirmarEliminar()" [disabled]="eliminando()" id="btn-confirmar-eliminar">
+          @if (eliminando()) {
+            <span class="spinner-sm"></span> Eliminando...
+          } @else {
+            <span class="material-icons-round">delete</span>
+            Sí, Eliminar
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

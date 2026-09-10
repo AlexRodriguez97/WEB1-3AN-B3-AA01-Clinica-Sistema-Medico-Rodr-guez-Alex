@@ -1,0 +1,129 @@
+<!-- Top Bar -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h1>Dashboard</h1>
+    <p class="breadcrumb">{{ fechaActual() }}</p>
+  </div>
+  <div class="topbar-right">
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      Sistema en línea
+    </div>
+    <div class="topbar-avatar">CS</div>
+  </div>
+</header>
+
+<div class="page-content">
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card fade-in fade-in-1">
+      <div class="stat-icon success">
+        <span class="material-icons-round">people</span>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ totalPacientes() }}</div>
+        <div class="stat-label">Pacientes Activos</div>
+      </div>
+    </div>
+
+    <div class="stat-card fade-in fade-in-2">
+      <div class="stat-icon accent">
+        <span class="material-icons-round">person</span>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ totalMedicos() }}</div>
+        <div class="stat-label">Médicos Registrados</div>
+      </div>
+    </div>
+
+    <div class="stat-card fade-in fade-in-3">
+      <div class="stat-icon blue">
+        <span class="material-icons-round">event_note</span>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ totalCitas() }}</div>
+        <div class="stat-label">Total de Citas</div>
+      </div>
+    </div>
+
+    <div class="stat-card fade-in fade-in-4">
+      <div class="stat-icon warning">
+        <span class="material-icons-round">cloud</span>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ climaTemp() !== null ? climaTemp() + '°' : '--' }}</div>
+        <div class="stat-label">Temperatura Actual</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Access -->
+  <div class="section-header">
+    <h2 class="section-title">
+      <span class="material-icons-round">apps</span>
+      Acceso Rápido
+    </h2>
+  </div>
+
+  <div class="quick-access-grid">
+    <a routerLink="/pacientes" class="quick-card" id="qc-pacientes">
+      <div class="quick-card-icon" style="background: var(--success-dim); color: var(--success);">
+        <span class="material-icons-round">people</span>
+      </div>
+      <h3>Pacientes</h3>
+      <p>Consultar el directorio completo de pacientes registrados</p>
+    </a>
+
+    <a routerLink="/medicos" class="quick-card" id="qc-medicos">
+      <div class="quick-card-icon" style="background: var(--accent-dim); color: var(--accent);">
+        <span class="material-icons-round">person</span>
+      </div>
+      <h3>Médicos</h3>
+      <p>Directorio completo del personal médico por especialidad</p>
+    </a>
+
+    <a routerLink="/citas" class="quick-card" id="qc-citas">
+      <div class="quick-card-icon" style="background: var(--accent2-dim); color: var(--accent2);">
+        <span class="material-icons-round">event_note</span>
+      </div>
+      <h3>Citas</h3>
+      <p>Gestionar citas médicas, crear y asignar paciente y médico</p>
+    </a>
+
+    <a routerLink="/tratamientos" class="quick-card" id="qc-tratamientos">
+      <div class="quick-card-icon" style="background: var(--accent-dim); color: var(--accent);">
+        <span class="material-icons-round">medical_services</span>
+      </div>
+      <h3>Tratamientos</h3>
+      <p>Ver citas con paciente y tratamiento asignado</p>
+    </a>
+
+    <a routerLink="/clima" class="quick-card" id="qc-clima">
+      <div class="quick-card-icon" style="background: var(--warning-dim); color: var(--warning);">
+        <span class="material-icons-round">wb_cloudy</span>
+      </div>
+      <h3>Clima &amp; Salud</h3>
+      <p>Recomendaciones de salud según condiciones climáticas</p>
+    </a>
+  </div>
+
+  <!-- Info Card -->
+  <div class="card home-info-card">
+    <div class="home-info-inner">
+      <div class="home-info-icon">
+        <span class="material-icons-round">local_hospital</span>
+      </div>
+      <div>
+        <h3>ClinicaSalud – Sistema de Gestión Médica</h3>
+        <p>Plataforma integrada que conecta con MedicoAPI (REST) y el servicio SOAP de TratamientoSOAP. Gestione pacientes, médicos, citas y acceda a recomendaciones de salud en tiempo real con la API externa Open-Meteo.</p>
+        <div class="api-chips">
+          <span class="chip">SOAP – TratamientoAPI :5087</span>
+          <span class="chip">REST – MedicoAPI :5204</span>
+          <span class="chip">API Externa – Open-Meteo (Clima)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

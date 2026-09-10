@@ -1,0 +1,61 @@
+<div class="app-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <span class="material-icons-round">local_hospital</span>
+      </div>
+      <div class="logo-text">
+        <span class="logo-name">ClinicaSalud</span>
+        <span class="logo-sub">Sistema Médico</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Principal</span>
+
+      <a routerLink="/home" routerLinkActive="active" class="nav-item" id="nav-home">
+        <span class="material-icons-round">dashboard</span>
+        Dashboard
+      </a>
+
+      <span class="nav-section-label">Gestión</span>
+
+      <a routerLink="/pacientes" routerLinkActive="active" class="nav-item" id="nav-pacientes">
+        <span class="material-icons-round">people</span>
+        Pacientes
+      </a>
+
+      <a routerLink="/medicos" routerLinkActive="active" class="nav-item" id="nav-medicos">
+        <span class="material-icons-round">person</span>
+        Médicos
+      </a>
+
+      <a routerLink="/citas" routerLinkActive="active" class="nav-item" id="nav-citas">
+        <span class="material-icons-round">event_note</span>
+        Citas
+      </a>
+
+      <a routerLink="/tratamientos" routerLinkActive="active" class="nav-item" id="nav-tratamientos">
+        <span class="material-icons-round">medical_services</span>
+        Tratamientos
+      </a>
+
+      <span class="nav-section-label">Herramientas</span>
+
+      <a routerLink="/clima" routerLinkActive="active" class="nav-item" id="nav-clima">
+        <span class="material-icons-round">cloud</span>
+        Clima &amp; Salud
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="version">v1.0.0 &middot; ClinicaDB</span>
+    </div>
+  </aside>
+
+  <!-- Main Content Outlet -->
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>

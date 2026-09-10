@@ -1,0 +1,130 @@
+.location-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.location-bar .material-icons-round {
+  font-size: 18px;
+  color: var(--accent);
+}
+
+.sensacion-termica {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ---------- Pronóstico ---------- */
+.pronostico-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.pronostico-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  transition: var(--transition);
+  backdrop-filter: blur(20px);
+}
+
+.pronostico-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.pronostico-day {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.pronostico-temps {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.temp-max {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.temp-min {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.pronostico-precip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ---------- UV Classes ---------- */
+.uv-low      { color: var(--success); }
+.uv-moderate { color: var(--warning); }
+.uv-very-high{ color: var(--danger); }
+.uv-extreme  { color: #ff3e3e; font-weight: 800; }
+
+/* ---------- Rec Count Badge ---------- */
+.rec-count-badge {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid rgba(0,212,170,0.2);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ---------- Disclaimer ---------- */
+.disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 24px;
+  line-height: 1.5;
+}
+
+.disclaimer .material-icons-round {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.disclaimer strong {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 700px) {
+  .pronostico-grid { grid-template-columns: 1fr; }
+  .clima-details { grid-template-columns: 1fr; }
+}

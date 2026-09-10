@@ -1,0 +1,119 @@
+<!-- Top Bar -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h1>Pacientes</h1>
+    <p class="breadcrumb">Directorio de pacientes registrados</p>
+  </div>
+  <div class="topbar-right">
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      TratamientoAPI :5087
+    </div>
+    <div class="topbar-avatar">PA</div>
+  </div>
+</header>
+
+<div class="page-content">
+
+  <!-- Stats row -->
+  @if (!cargando() && !error()) {
+    <div class="pacientes-stats fade-in">
+      <div class="pstat">
+        <span class="pstat-val">{{ pacientes().length }}</span>
+        <span class="pstat-label">Total pacientes</span>
+      </div>
+      <div class="pstat-divider"></div>
+      <div class="pstat">
+        <span class="pstat-val" style="color: var(--success)">{{ totalActivos() }}</span>
+        <span class="pstat-label">Activos</span>
+      </div>
+      <div class="pstat-divider"></div>
+      <div class="pstat">
+        <span class="pstat-val" style="color: var(--text-muted)">{{ pacientes().length - totalActivos() }}</span>
+        <span class="pstat-label">Inactivos</span>
+      </div>
+    </div>
+  }
+
+  <!-- Section Header -->
+  <div class="section-header fade-in">
+    <h2 class="section-title">
+      <span class="material-icons-round">people</span>
+      Lista de Pacientes ({{ pacientesFiltrados().length }})
+    </h2>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <div class="search-bar">
+        <span class="material-icons-round">search</span>
+        <input
+          type="text"
+          placeholder="Buscar paciente..."
+          [(ngModel)]="busqueda"
+          (input)="filtrar()"
+          id="buscar-pacientes"
+        >
+      </div>
+      <button class="btn btn-ghost" (click)="cargarPacientes()" id="btn-refresh-pacientes">
+        <span class="material-icons-round">refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (cargando()) {
+    <div class="loading-spinner fade-in">
+      <div class="spinner"></div>
+      <span>Cargando pacientes desde TratamientoAPI...</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (!cargando() && error()) {
+    <div class="alert-error fade-in">
+      <span class="material-icons-round">error_outline</span>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Cards Grid -->
+  @if (!cargando() && !error()) {
+    @if (pacientesFiltrados().length === 0) {
+      <div class="empty-state fade-in">
+        <span class="material-icons-round">person_search</span>
+        <h3>No se encontraron pacientes</h3>
+        <p>Intente con otros términos de búsqueda</p>
+      </div>
+    } @else {
+      <div class="pacientes-grid" id="grid-pacientes">
+        @for (paciente of pacientesFiltrados(); track paciente.idPaciente) {
+          <div class="paciente-card fade-in">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div class="pac-avatar">{{ getIniciales(paciente) }}</div>
+              <div>
+                <div class="pac-name">{{ paciente.nombre }} {{ paciente.apellido }}</div>
+                <div class="pac-cedula">CI: {{ paciente.cedula }}</div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="pac-info-row">
+                <span class="material-icons-round">phone</span>
+                {{ paciente.telefono || 'Sin teléfono' }}
+              </div>
+              <div class="pac-info-row">
+                <span class="material-icons-round">tag</span>
+                ID: {{ paciente.idPaciente }}
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="badge" [class]="getEstadoBadge(paciente.estado)">
+                {{ getEstadoLabel(paciente.estado) }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>

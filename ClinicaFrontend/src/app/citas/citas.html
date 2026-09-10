@@ -1,0 +1,254 @@
+<!-- Top Bar -->
+<header class="topbar">
+  <div class="topbar-left">
+    <h1>Citas Médicas</h1>
+    <p class="breadcrumb">Gestión de citas con paciente y médico asignado</p>
+  </div>
+  <div class="topbar-right">
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      TratamientoAPI :5087
+    </div>
+    <div class="topbar-avatar">CT</div>
+  </div>
+</header>
+
+<div class="page-content">
+
+  <!-- Mensaje de éxito/error -->
+  @if (mensaje()) {
+    <div class="alert-msg fade-in" id="alert-mensaje">
+      <span class="material-icons-round">info</span>
+      {{ mensaje() }}
+      <button class="btn-close-msg" (click)="mensaje.set('')">✕</button>
+    </div>
+  }
+
+  <!-- Section Header -->
+  <div class="section-header fade-in">
+    <h2 class="section-title">
+      <span class="material-icons-round">event_note</span>
+      Lista de Citas ({{ citasFiltradas().length }})
+    </h2>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <div class="search-bar">
+        <span class="material-icons-round">search</span>
+        <input
+          type="text"
+          placeholder="Buscar por motivo, paciente..."
+          [(ngModel)]="busqueda"
+          (input)="buscar()"
+          id="buscar-citas"
+        >
+      </div>
+      <button class="btn btn-primary" (click)="abrirCrear()" id="btn-nueva-cita">
+        <span class="material-icons-round">add</span>
+        Nueva Cita
+      </button>
+      <button class="btn btn-ghost" (click)="cargarDatos()" id="btn-refresh">
+        <span class="material-icons-round">refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (cargando()) {
+    <div class="loading-spinner fade-in">
+      <div class="spinner"></div>
+      <span>Cargando citas desde TratamientoAPI...</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (!cargando() && error()) {
+    <div class="alert-error fade-in">
+      <span class="material-icons-round">error_outline</span>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- Table -->
+  @if (!cargando() && !error()) {
+    @if (citasFiltradas().length === 0) {
+      <div class="empty-state fade-in">
+        <span class="material-icons-round">event_busy</span>
+        <h3>No hay citas registradas</h3>
+        <p>Haga clic en "Nueva Cita" para agregar una</p>
+      </div>
+    } @else {
+      <div class="table-wrapper fade-in">
+        <table class="data-table" id="tabla-citas-crud">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Paciente</th>
+              <th>Médico</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Motivo</th>
+              <th>Tratamiento</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cita of citasFiltradas(); track cita.idCita) {
+              <tr>
+                <td>
+                  <span style="color: var(--text-muted); font-size: 13px;">#{{ cita.idCita }}</span>
+                </td>
+                <td>
+                  <div class="cell-paciente">
+                    <div class="cell-avatar">
+                      {{ getNombrePaciente(cita.idPaciente).charAt(0) }}
+                    </div>
+                    <span>{{ getNombrePaciente(cita.idPaciente) }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span style="color: var(--accent2); font-size: 13px;">
+                    {{ getNombreMedico(cita.idMedico) }}
+                  </span>
+                </td>
+                <td>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="material-icons-round" style="font-size:15px; color:var(--text-muted)">event</span>
+                    {{ formatFecha(cita.fecha) }}
+                  </div>
+                </td>
+                <td>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="material-icons-round" style="font-size:15px; color:var(--text-muted)">schedule</span>
+                    {{ formatHora(cita.hora) }}
+                  </div>
+                </td>
+                <td style="max-width:160px;">
+                  <span class="text-truncate">{{ cita.motivo || '—' }}</span>
+                </td>
+                <td style="max-width:160px;">
+                  <span class="text-truncate" style="font-weight:500;">{{ cita.descTratamiento || '—' }}</span>
+                </td>
+                <td>
+                  <span class="badge" [class]="getEstadoBadge(cita.estado)">
+                    {{ getEstadoLabel(cita.estado) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="acciones-cell">
+                    <button class="btn-icon btn-edit" (click)="abrirEditar(cita)" title="Editar">
+                      <span class="material-icons-round">edit</span>
+                    </button>
+                    <button class="btn-icon btn-delete" (click)="eliminarCita(cita)" title="Eliminar">
+                      <span class="material-icons-round">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+</div>
+
+<!-- Modal Formulario Cita -->
+@if (mostrarModal()) {
+  <div class="modal-overlay" (click)="cerrarModal()" id="modal-cita">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>
+          <span class="material-icons-round">{{ editando() ? 'edit_calendar' : 'add_circle' }}</span>
+          {{ editando() ? 'Editar Cita' : 'Nueva Cita' }}
+        </h2>
+        <button class="btn-icon" (click)="cerrarModal()">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Paciente -->
+        <div class="form-group">
+          <label for="sel-paciente">
+            <span class="material-icons-round">person</span> Paciente
+          </label>
+          <select id="sel-paciente" [(ngModel)]="citaForm.idPaciente" class="form-input">
+            <option [value]="0" disabled>-- Seleccione paciente --</option>
+            @for (pac of pacientes(); track pac.idPaciente) {
+              <option [value]="pac.idPaciente">{{ pac.nombre }} {{ pac.apellido }} ({{ pac.cedula }})</option>
+            }
+          </select>
+        </div>
+
+        <!-- Médico -->
+        <div class="form-group">
+          <label for="sel-medico">
+            <span class="material-icons-round">medical_services</span> Médico
+          </label>
+          <select id="sel-medico" [(ngModel)]="citaForm.idMedico" class="form-input">
+            <option [value]="0">-- Sin asignar --</option>
+            @for (med of medicos(); track med.idMedico) {
+              <option [value]="med.idMedico">Dr. {{ med.nombre }} {{ med.apellido }} - {{ med.especialidad }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Fecha y Hora -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="inp-fecha">
+              <span class="material-icons-round">event</span> Fecha
+            </label>
+            <input type="date" id="inp-fecha" [(ngModel)]="citaForm.fecha" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="inp-hora">
+              <span class="material-icons-round">schedule</span> Hora
+            </label>
+            <input type="time" id="inp-hora" [(ngModel)]="citaForm.hora" class="form-input">
+          </div>
+        </div>
+
+        <!-- Motivo -->
+        <div class="form-group">
+          <label for="inp-motivo">
+            <span class="material-icons-round">description</span> Motivo
+          </label>
+          <input type="text" id="inp-motivo" [(ngModel)]="citaForm.motivo" class="form-input"
+                 placeholder="Ej: Chequeo general, Dolor muela...">
+        </div>
+
+        <!-- Tratamiento -->
+        <div class="form-group">
+          <label for="inp-tratamiento">
+            <span class="material-icons-round">healing</span> Tratamiento
+          </label>
+          <input type="text" id="inp-tratamiento" [(ngModel)]="citaForm.descTratamiento" class="form-input"
+                 placeholder="Ej: Medicina general, Odontología...">
+        </div>
+
+        <!-- Estado -->
+        <div class="form-group">
+          <label for="sel-estado">
+            <span class="material-icons-round">toggle_on</span> Estado
+          </label>
+          <select id="sel-estado" [(ngModel)]="citaForm.estado" class="form-input">
+            <option [value]="1">Activa</option>
+            <option [value]="0">Inactiva</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" (click)="cerrarModal()" [disabled]="guardando()">
+          Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="guardarCita()" [disabled]="guardando()" id="btn-guardar-cita">
+          <span class="material-icons-round">{{ guardando() ? 'hourglass_empty' : 'save' }}</span>
+          {{ guardando() ? 'Guardando...' : (editando() ? 'Actualizar' : 'Crear Cita') }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
